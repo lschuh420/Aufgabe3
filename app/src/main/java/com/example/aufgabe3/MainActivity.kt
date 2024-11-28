@@ -17,14 +17,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -33,23 +37,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.aufgabe3.ui.theme.Aufgabe3Theme
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.ui.res.painterResource
 
-// MainActivity.kt: Haupt-Einstiegspunkt der App
+/**
+ * MainActivity.kt: Haupt-Einstiegspunkt der App.
+ * Aktiviert die "Edge-to-Edge"-Anzeige und setzt den Inhalt der App.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,19 +67,34 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// Datenmodell für ein ToDo-Item
+/**
+ * Datenmodell für ein ToDo-Item.
+ *
+ * @param title Der Titel des ToDo-Items.
+ * @param isCompleted Der Status des ToDo-Items (erledigt oder nicht).
+ * @param priority Die Priorität des ToDo-Items.
+ */
 data class TodoItem(
     val title: String,       // Titel des ToDo
     val isCompleted: Boolean, // Status: erledigt oder nicht
     val priority: Priority   // Priorität (HIGH, MEDIUM, LOW)
 )
 
-// Enum für die Prioritäten der ToDos
+/**
+ * Enum für die Prioritäten der ToDos.
+ */
 enum class Priority {
     HIGH, MEDIUM, LOW
 }
 
-// UI-Komponente, die den ToDo-Bildschirm definiert
+/**
+ * UI-Komponente, die den ToDo-Bildschirm definiert.
+ *
+ * Zeigt eine Liste von ToDo-Items an und ermöglicht das Hinzufügen neuer Items.
+ *
+ * @param modifier Modifier zur Anpassung des Layouts.
+ * @param viewModel Das ViewModel, das die Logik und die Daten für die Liste verwaltet.
+ */
 @Composable
 fun TodoListScreen(modifier: Modifier, viewModel: TodoViewModel) {
     var showDialog by remember { mutableStateOf(false) } // Steuert die Sichtbarkeit des Dialogs
@@ -183,7 +196,9 @@ fun TodoListScreen(modifier: Modifier, viewModel: TodoViewModel) {
     }
 }
 
-
+/**
+ * Vorschau der `TodoListScreen`-Komponente für die UI-Entwicklung.
+ */
 @Preview(showBackground = true)
 @Composable
 fun TodoListScreenPreview(){
@@ -194,6 +209,16 @@ fun TodoListScreenPreview(){
         )
     }
 }
+
+/**
+ * UI-Komponente für das ToDo-Item, das in der Liste angezeigt wird.
+ *
+ * Zeigt den Titel, den Status (abgehakt oder nicht), und die Priorität des ToDos an.
+ *
+ * @param item Das ToDo-Item, das angezeigt wird.
+ * @param onItemClicked Callback, wenn das ToDo abgehakt wird.
+ * @param onDeletClicked Callback, wenn das ToDo gelöscht wird.
+ */
 @Composable
 fun TodoItemCard(
     item: TodoItem,
@@ -233,10 +258,21 @@ fun TodoItemCard(
     }
 }
 
+/**
+ * ViewModel, das die Daten und Logik für die ToDo-Liste verwaltet.
+ *
+ * @property todos Die Liste der ToDos, die im UI angezeigt werden.
+ */
 class TodoViewModel : ViewModel() {
     private val _todos = MutableLiveData<List<TodoItem>>(emptyList())
     val todos: LiveData<List<TodoItem>> get() = _todos
 
+    /**
+     * Fügt ein neues ToDo-Item hinzu.
+     *
+     * @param title Der Titel des ToDo-Items.
+     * @param priority Die Priorität des ToDo-Items.
+     */
     fun addItem(title: String, priority: Priority) {
         val currentList = _todos.value ?: emptyList()
         val updatedList = (currentList + TodoItem(title = title, isCompleted = false, priority = priority))
@@ -244,12 +280,22 @@ class TodoViewModel : ViewModel() {
         _todos.value = updatedList
     }
 
+    /**
+     * Löscht ein ToDo-Item aus der Liste.
+     *
+     * @param todoItem Das zu löschende ToDo-Item.
+     */
     fun deleteTodoItem(todoItem: TodoItem) {
         val currentList = _todos.value ?: emptyList()
         val updatedList = currentList - todoItem
         _todos.value = updatedList
     }
 
+    /**
+     * Ändert den Status eines ToDo-Items (abgehakt/nicht abgehakt).
+     *
+     * @param todoItem Das ToDo-Item, dessen Status geändert werden soll.
+     */
     fun toggleTodoItem(todoItem: TodoItem) {
         val currentList = _todos.value ?: emptyList()
         val updatedList = currentList.map {
